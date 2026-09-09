@@ -1,0 +1,42 @@
+{
+  "name": "@moz/preview",
+  "version": "0.1.0",
+  "description": "Responsive preview library with infinite canvas",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup && tsc -p tsconfig.types.json",
+    "prepublishOnly": "bun run build",
+    "dev": "tsup --watch"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "react-infinite-canvas": "^3.4.1",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.8.3"
+  }
+}
