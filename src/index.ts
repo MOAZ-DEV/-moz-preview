@@ -3,6 +3,7 @@ export { Canvas } from "./components/canvas";
 export { Viewport } from "./components/canvas/viewport";
 export { Nav } from "./components/overlay/nav";
 export { Dock } from "./components/overlay/dock";
+export { SettingsPanel } from "./components/overlay/settings-panel";
 export { KeybindingsHint } from "./components/overlay/keybindings-hint";
 export { useIdle } from "./hooks/use-idle";
 export * from "./types";
@@ -11,6 +12,7 @@ export { createCanvasItems, variantsFromItems } from "./lib/canvas-utils";
 export { cn } from "./lib";
 export { registerCameraController, getCameraController } from "./lib/camera";
 export type { CameraController } from "./lib/camera";
+export { isFigmaUrl, figmaEmbedUrl } from "./lib/figma";
 
 /* Design system primitives */
 export { Button, IconButton } from "./components/ui/button";

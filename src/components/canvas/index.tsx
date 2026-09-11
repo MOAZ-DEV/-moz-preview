@@ -74,10 +74,17 @@ export function Canvas({ childrenElements, className }: Props) {
   }, []);
 
   // Fit all variants on mount / when variant count changes / container resizes
-  // Intentionally NOT re-fitting on drag/resize of individual variants
+  // Skip the initial fit if canvas was restored from persistence
+  const restoredFitDoneRef = useRef(state.canvas.restored);
   useEffect(() => {
     const el = containerRef.current;
     if (!el || state.variants.length === 0) return;
+
+    // Skip first run if restored — don't override persisted view
+    if (restoredFitDoneRef.current) {
+      restoredFitDoneRef.current = false;
+      return;
+    }
 
     const raf = requestAnimationFrame(() => fitToViewRef.current());
     const ro = new ResizeObserver(() => fitToViewRef.current());
@@ -153,15 +160,27 @@ export function Canvas({ childrenElements, className }: Props) {
   const onResize = useCallback(
     (id: string, width: number, x?: number) => {
       dispatch({ type: "RESIZE_VARIANT", payload: { id, width, x } });
+      // Images: recompute height from aspect when width changes
+      const variant = state.variants.find((v) => v.id === id);
+      if (variant?.kind === "image" && variant.aspect) {
+        dispatch({
+          type: "SET_NATURAL_HEIGHT",
+          payload: { id, height: Math.round(width * variant.aspect), aspect: variant.aspect },
+        });
+      }
     },
-    [dispatch],
+    [dispatch, state.variants],
   );
 
   const onHeightChange = useCallback(
     (id: string, height: number) => {
-      dispatch({ type: "SET_NATURAL_HEIGHT", payload: { id, height } });
+      const variant = state.variants.find((v) => v.id === id);
+      const aspect = variant?.kind === "image" && variant.width > 0
+        ? height / variant.width
+        : null;
+      dispatch({ type: "SET_NATURAL_HEIGHT", payload: { id, height, aspect } });
     },
-    [dispatch],
+    [dispatch, state.variants],
   );
 
   return (

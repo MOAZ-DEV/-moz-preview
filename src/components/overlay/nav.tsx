@@ -160,7 +160,7 @@ export function Nav({ state, onSetPath, onAddRecent, onResetView }: Props) {
                         spellCheck={false}
                         autoComplete="off"
                         aria-label="Current path"
-                        className="h-6 w-[110px] rounded-sm bg-transparent px-1.5 font-mono text-xs text-foreground placeholder:font-sans placeholder:text-muted-foreground/50 focus:outline-none sm:w-[180px]"
+                        className="h-6 w-[72px] rounded-sm bg-transparent px-1.5 font-mono text-xs text-foreground placeholder:font-sans placeholder:text-muted-foreground/50 focus:outline-none min-[420px]:w-[110px] sm:w-[180px]"
                     />
                     <IconButton
                         label="Go to path"
@@ -186,16 +186,18 @@ export function Nav({ state, onSetPath, onAddRecent, onResetView }: Props) {
                 </form>
 
                 {state.ui.recentPaths.length > 0 && (
-                    <RecentMenu
-                        paths={state.ui.recentPaths}
-                        onSelect={(path) => {
-                            onSetPath(path);
-                            setInputValue(path);
-                        }}
-                    />
+                    <div className="hidden sm:block">
+                        <RecentMenu
+                            paths={state.ui.recentPaths}
+                            onSelect={(path) => {
+                                onSetPath(path);
+                                setInputValue(path);
+                            }}
+                        />
+                    </div>
                 )}
 
-                <div className="h-4 w-px bg-border" />
+                <div className="hidden sm:block h-4 w-px bg-border" />
 
                 {/* Actions */}
                 <div className="flex items-center gap-0.5">
@@ -227,7 +229,7 @@ export function Nav({ state, onSetPath, onAddRecent, onResetView }: Props) {
 
                     <Badge
                         variant="secondary"
-                        className="hidden sm:inline-flex"
+                        className="hidden md:inline-flex"
                     >
                         {state.variants.length} variants
                     </Badge>

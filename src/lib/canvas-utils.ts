@@ -29,6 +29,9 @@ export function variantsFromItems(items: CanvasItem[]): VariantState[] {
   return items.map((item) => ({
     id: item.id,
     variant: item.variant,
+    kind: "element" as const,
+    source: null,
+    aspect: null,
     x: item.position.x,
     y: item.position.y,
     width: item.size.width,
