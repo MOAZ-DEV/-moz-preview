@@ -7,7 +7,7 @@ export default defineConfig({
   sourcemap: true,
   splitting: false,
   clean: true,
-  external: ["react", "react-dom", "react-infinite-canvas"],
+  external: ["react", "react-dom"],
   esbuildOptions(options) {
     options.jsx = "automatic";
     options.banner = {

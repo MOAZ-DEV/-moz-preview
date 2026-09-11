@@ -11,32 +11,43 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    }
+    },
+    "./dist/index.css": "./dist/index.css",
+    "./styles.css": "./dist/index.css"
   },
+  "style": "dist/index.css",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup && tsc -p tsconfig.types.json",
-    "prepublishOnly": "bun run build",
-    "dev": "tsup --watch"
+    "gen:css": "bun scripts/gen-styles.ts",
+    "build": "npm run gen:css && tsup && postcss src/components/style.css -o dist/index.css && tsc -p tsconfig.types.json",
+    "build:css": "postcss src/components/style.css -o dist/index.css",
+    "dev": "npm run gen:css && concurrently \"tsup --watch\" \"bun scripts/gen-styles.ts --watch\" \"postcss src/components/style.css -o dist/index.css --watch --verbose\"",
+    "dev:css": "postcss src/components/style.css -o dist/index.css --watch",
+    "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
     "react": ">=18.0.0",
     "react-dom": ">=18.0.0"
   },
-  "dependencies": {
-    "react-infinite-canvas": "^3.4.1",
-    "zustand": "^5.0.15"
-  },
+  "sideEffects": ["*.css"],
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
     "@types/bun": "latest",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "concurrently": "^10.0.5",
+    "postcss": "^8.5.28",
+    "postcss-cli": "^12.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "tailwindcss": "^4.3.3",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.6.0"
   }
 }
