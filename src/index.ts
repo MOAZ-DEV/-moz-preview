@@ -3,6 +3,8 @@ export { Canvas } from "./components/canvas";
 export { Viewport } from "./components/canvas/viewport";
 export { Nav } from "./components/overlay/nav";
 export { Dock } from "./components/overlay/dock";
+export { KeybindingsHint } from "./components/overlay/keybindings-hint";
+export { useIdle } from "./hooks/use-idle";
 export * from "./types";
 export { DEFAULT_BREAKPOINTS, DEFAULT_GAP, MIN_SCALE, MAX_SCALE } from "./lib/constants";
 export { createCanvasItems, variantsFromItems } from "./lib/canvas-utils";

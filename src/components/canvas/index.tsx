@@ -6,6 +6,7 @@ import { usePreventZoom } from "../../hooks/use-prevent-zoom";
 import { cn } from "../../lib";
 import { useCrowPreview } from "../provider";
 import { MIN_SCALE, MAX_SCALE, GRID_EXTENT } from "../../lib/constants";
+import { KeybindingsHint } from "../overlay/keybindings-hint";
 
 type Props = {
   childrenElements: React.ReactNode;
@@ -187,6 +188,7 @@ export function Canvas({ childrenElements, className }: Props) {
           />
         ))}
       </div>
+      <KeybindingsHint />
     </div>
   );
 }
