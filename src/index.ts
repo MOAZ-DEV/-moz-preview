@@ -9,6 +9,8 @@ export * from "./types";
 export { DEFAULT_BREAKPOINTS, DEFAULT_GAP, MIN_SCALE, MAX_SCALE } from "./lib/constants";
 export { createCanvasItems, variantsFromItems } from "./lib/canvas-utils";
 export { cn } from "./lib";
+export { registerCameraController, getCameraController } from "./lib/camera";
+export type { CameraController } from "./lib/camera";
 
 /* Design system primitives */
 export { Button, IconButton } from "./components/ui/button";

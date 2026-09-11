@@ -1,7 +1,7 @@
 {
   "name": "@moz/preview",
   "version": "0.1.0",
-  "description": "Responsive preview library with infinite canvas",
+  "description": "Responsive preview library",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",

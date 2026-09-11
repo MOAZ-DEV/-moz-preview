@@ -1,9 +1,10 @@
-import React, { RefObject, useCallback, useEffect } from "react";
+import React, { RefObject, useCallback, useEffect, useRef } from "react";
 import { State } from "../../types";
 import { Viewport } from "./viewport";
 import { useCanvasPanZoom } from "../../hooks/use-canvas-pan-zoom";
 import { usePreventZoom } from "../../hooks/use-prevent-zoom";
 import { cn } from "../../lib";
+import { registerCameraController } from "../../lib/camera";
 import { useCrowPreview } from "../provider";
 import { MIN_SCALE, MAX_SCALE, GRID_EXTENT } from "../../lib/constants";
 import { KeybindingsHint } from "../overlay/keybindings-hint";
@@ -27,49 +28,66 @@ export function Canvas({ childrenElements, className }: Props) {
 
   usePreventZoom(containerRef as RefObject<HTMLDivElement>);
 
-  // Fit all variants width-only on mount / when count changes / container resizes
+  // Fit all variants width-only (per segment assumptions set by createCanvasItems)
+  const fitToView = useCallback(() => {
+    const el = containerRef.current;
+    if (!el || state.variants.length === 0) return;
+
+    const rect = el.getBoundingClientRect();
+    const vw = rect.width;
+    const vh = rect.height;
+    if (vw === 0 || vh === 0) return;
+
+    const minX = Math.min(...state.variants.map((v) => v.x));
+    const maxX = Math.max(...state.variants.map((v) => v.x + v.width));
+    const contentWidth = maxX - minX;
+    const contentCenterX = (minX + maxX) / 2;
+
+    const minY = Math.min(...state.variants.map((v) => v.y));
+    const maxY = Math.max(...state.variants.map((v) => v.y + v.height));
+    const contentCenterY = (minY + maxY) / 2;
+
+    const PADDING = 48; // px on each side
+    const availableWidth = vw - PADDING * 2;
+    const idealScale = availableWidth / contentWidth;
+    const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, idealScale));
+    const clampedScale = targetScale;
+
+    const targetOffsetX = vw / 2 - contentCenterX * clampedScale;
+    const targetOffsetY = vh / 2 - contentCenterY * clampedScale;
+
+    dispatch({ type: "SET_SCALE", payload: { scale: clampedScale } });
+    dispatch({ type: "SET_OFFSET", payload: { offsetX: targetOffsetX, offsetY: targetOffsetY } });
+  }, [state.variants, containerRef, dispatch]);
+
+  // Always register the latest fit/zoom implementations so overlay controls
+  // (dock, nav reset) can drive the camera without re-arming effects.
+  const fitToViewRef = useRef(fitToView);
+  fitToViewRef.current = fitToView;
+  const zoomToVariantRef = useRef<(id: string) => void>(() => {});
+
+  useEffect(() => {
+    return registerCameraController({
+      zoomToVariant: (id) => zoomToVariantRef.current(id),
+      fitToView: () => fitToViewRef.current(),
+    });
+  }, []);
+
+  // Fit all variants on mount / when variant count changes / container resizes
   // Intentionally NOT re-fitting on drag/resize of individual variants
   useEffect(() => {
     const el = containerRef.current;
     if (!el || state.variants.length === 0) return;
 
-    const fitWidth = () => {
-      const rect = el.getBoundingClientRect();
-      const vw = rect.width;
-      const vh = rect.height;
-      if (vw === 0 || vh === 0) return;
-
-      const minX = Math.min(...state.variants.map((v) => v.x));
-      const maxX = Math.max(...state.variants.map((v) => v.x + v.width));
-      const contentWidth = maxX - minX;
-      const contentCenterX = (minX + maxX) / 2;
-
-      const minY = Math.min(...state.variants.map((v) => v.y));
-      const maxY = Math.max(...state.variants.map((v) => v.y + v.height));
-      const contentCenterY = (minY + maxY) / 2;
-
-      const PADDING = 48; // px on each side
-      const availableWidth = vw - PADDING * 2;
-      const idealScale = availableWidth / contentWidth;
-      const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, idealScale));
-      const clampedScale = targetScale;
-
-      const targetOffsetX = vw / 2 - contentCenterX * clampedScale;
-      const targetOffsetY = vh / 2 - contentCenterY * clampedScale;
-
-      dispatch({ type: "SET_SCALE", payload: { scale: clampedScale } });
-      dispatch({ type: "SET_OFFSET", payload: { offsetX: targetOffsetX, offsetY: targetOffsetY } });
-    };
-
-    const raf = requestAnimationFrame(fitWidth);
-    const ro = new ResizeObserver(fitWidth);
+    const raf = requestAnimationFrame(() => fitToViewRef.current());
+    const ro = new ResizeObserver(() => fitToViewRef.current());
     ro.observe(el);
 
     return () => {
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [containerRef, dispatch, state.variants.length]);
+  }, [containerRef, state.variants.length]);
 
   // Zoom-to-fit for a given variant
   const zoomToVariant = useCallback(
@@ -100,6 +118,7 @@ export function Canvas({ childrenElements, className }: Props) {
     },
     [state.variants, containerRef, dispatch],
   );
+  zoomToVariantRef.current = zoomToVariant;
 
   // Background click: unfocus if focused, then start pan
   const handleBackgroundMouseDown = (e: React.MouseEvent) => {

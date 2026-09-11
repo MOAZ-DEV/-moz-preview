@@ -1,6 +1,7 @@
 import React from "react";
 import { State } from "../../types";
 import { cn } from "../../lib";
+import { getCameraController } from "../../lib/camera";
 import { Segmented } from "../ui/segmented";
 import { IconButton } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -20,10 +21,14 @@ export function Dock({ state, dispatch }: Props) {
   const setDevice = (value: Device) => {
     if (value === "all") {
       dispatch({ type: "UNFOCUS" });
+      getCameraController()?.fitToView();
       return;
     }
     const target = state.variants.find((v) => v.variant === value);
-    if (target) dispatch({ type: "FOCUS", payload: { id: target.id } });
+    if (target) {
+      dispatch({ type: "FOCUS", payload: { id: target.id } });
+      getCameraController()?.zoomToVariant(target.id);
+    }
   };
 
   const zoomBy = (delta: number) => {

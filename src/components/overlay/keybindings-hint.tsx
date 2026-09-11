@@ -53,7 +53,7 @@ export function KeybindingsHint() {
   return (
     <div
       className={cn(
-        "pointer-events-none absolute bottom-6 left-1/2 z-30 -translate-x-1/2 transition-opacity duration-700",
+        "pointer-events-none absolute bottom-16 left-1/2 mt-[100vh] z-30 -translate-x-1/2 transition-opacity duration-700",
         isIdle ? "opacity-100" : "opacity-0",
       )}
     >

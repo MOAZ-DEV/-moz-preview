@@ -16,6 +16,7 @@ import { Nav } from "./overlay/nav";
 import { Dock } from "./overlay/dock";
 import { ConsolePanel } from "./overlay/console-panel";
 import { useKeybindings } from "../hooks/use-keybindings";
+import { getCameraController } from "../lib/camera";
 import { cn } from "../lib";
 import styles from "../generated/styles";
 
@@ -237,7 +238,10 @@ export function CrowPreviewProvider({
     dispatch({ type: "SET_PATH", payload: { path } });
   const onAddRecent = (path: string) =>
     dispatch({ type: "ADD_RECENT_PATH", payload: { path } });
-  const onResetView = () => dispatch({ type: "RESET_VIEW" });
+  const onResetView = () => {
+    dispatch({ type: "RESET_VIEW" });
+    getCameraController()?.fitToView();
+  };
 
   const contextValue: CrowPreviewContextValue = { state, dispatch };
 
